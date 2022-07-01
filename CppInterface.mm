@@ -1,5 +1,5 @@
 #import "CppInterface.h"
-#include <FooBar/Foo.hh>
+#include "Foo.hh"
 
 @interface CppInterface () 
 {

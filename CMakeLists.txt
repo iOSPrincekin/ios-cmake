@@ -18,6 +18,7 @@ project(${DEVELOPMENT_PROJECT_NAME})
 include(BundleUtilities)
 include(FindXCTest)
 
+include_directories(/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
 message(STATUS XCTestFound:${XCTest_FOUND})
 
 set(PRODUCT_NAME ${APP_NAME})
@@ -33,6 +34,7 @@ set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
 set(MACOSX_BUNDLE_COPYRIGHT "Copyright YOU")
 set(MACOSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
 
+#set(CMAKE_OSX_SYSROOT iphoneos)
 set(APP_HEADER_FILES
   ./AppDelegate.h
   ./ViewController.h
@@ -51,7 +53,6 @@ set(RESOURCES
   ./Main.storyboard
   ./LaunchScreen.storyboard
 )
-
 add_executable(
     ${APP_NAME}
     MACOSX_BUNDLE
@@ -60,6 +61,7 @@ add_executable(
     ${RESOURCES}
 )
 
+link_directories(/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
 # To disable bitcode:
 # set_target_properties(${APP_NAME} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
 
@@ -87,7 +89,7 @@ add_executable(
 # target_include_directories(${APP_NAME}
 #   PUBLIC ${PROJECT_SOURCE_DIR}/framework/include
 # )
-
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
 # Build the C++ dynamically linked framework
 add_subdirectory(cppframework)
 add_dependencies(${APP_NAME} ${FRAMEWORK_NAME})
@@ -103,11 +105,22 @@ find_library(CFNETWORK CFNetwork)
 find_library(SYSTEMCONFIGURATION SystemConfiguration)
 
 # link the frameworks located above
-target_link_libraries(${APP_NAME} ${UIKIT})
-target_link_libraries(${APP_NAME} ${FOUNDATION})
-target_link_libraries(${APP_NAME} ${MOBILECORESERVICES})
-target_link_libraries(${APP_NAME} ${CFNETWORK})
-target_link_libraries(${APP_NAME} ${SYSTEMCONFIGURATION})
+#target_link_libraries(${APP_NAME} ${UIKIT})
+#target_link_libraries(${APP_NAME} ${FOUNDATION})
+#target_link_libraries(${APP_NAME} ${MOBILECORESERVICES})
+#target_link_libraries(${APP_NAME} ${CFNETWORK})
+#target_link_libraries(${APP_NAME} ${SYSTEMCONFIGURATION})
+#target_link_libraries(${APP_NAME} /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks/FooBar.framework)
+
+
+target_link_libraries(${APP_NAME}
+  "-framework MobileCoreServices"
+  "-framework Foundation"
+  "-framework UIKit"
+  "-framework CFNetwork"
+  "-framework SystemConfiguration"
+  "-framework FooBar"
+  )
 
 # Link the framework to the app
 set_target_properties(${APP_NAME} PROPERTIES
@@ -115,7 +128,9 @@ set_target_properties(${APP_NAME} PROPERTIES
 )
 
 # Turn on ARC
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc -stdlib=libc++")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
+
 
 # Create the app target
 set_target_properties(${APP_NAME} PROPERTIES

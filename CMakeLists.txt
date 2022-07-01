@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.7)
 
 set(DEVELOPMENT_PROJECT_NAME "project")                     # <== Set to your project name, e.g. project.xcodeproj
-set(DEVELOPMENT_TEAM_ID "AAAAAAAAAA")                       # <== Set to your team ID from Apple
+set(DEVELOPMENT_TEAM_ID "RXZED79P6J")                       # <== Set to your team ID from Apple
 set(APP_NAME "YOURAPP")                                     # <== Set To your app's name
 set(APP_BUNDLE_IDENTIFIER "com.company.app")                # <== Set to your app's bundle identifier
 set(FRAMEWORK_NAME "FooBar")                                # <== Set to your framework's name

@@ -1,21 +1,20 @@
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.19)
 
 set(DEVELOPMENT_PROJECT_NAME "project")                     # <== Set to your project name, e.g. project.xcodeproj
-set(DEVELOPMENT_TEAM_ID "RXZED79P6J")                       # <== Set to your team ID from Apple
+set(DEVELOPMENT_TEAM_ID "GXH8LLTUQN")                       # <== Set to your team ID from Apple
 set(APP_NAME "YOURAPP")                                     # <== Set To your app's name
-set(APP_BUNDLE_IDENTIFIER "com.company.app")                # <== Set to your app's bundle identifier
+set(APP_BUNDLE_IDENTIFIER "com.company.appCmake")                # <== Set to your app's bundle identifier
 set(FRAMEWORK_NAME "FooBar")                                # <== Set to your framework's name
 set(FRAMEWORK_BUNDLE_IDENTIFIER "com.company.framework")    # <== Set to your framework's bundle identifier (cannot be the same as app bundle identifier)
 set(TEST_NAME "Tests")                                      # <== Set to your test's name
 set(TEST_BUNDLE_IDENTIFIER "com.company.tests")             # <== Set to your tests's bundle ID
-set(CODE_SIGN_IDENTITY "iPhone Developer")                  # <== Set to your preferred code sign identity, to see list:
+set(CODE_SIGN_IDENTITY "Apple Development: lslboyfuture@icloud.com")                  # <== Set to your preferred code sign identity, to see list:
                                                             # /usr/bin/env xcrun security find-identity -v -p codesigning
 set(DEPLOYMENT_TARGET 8.0)                                  # <== Set your deployment target version of iOS
 set(DEVICE_FAMILY "1")                                      # <== Set to "1" to target iPhone, set to "2" to target iPad, set to "1,2" to target both
 set(LOGIC_ONLY_TESTS 0)                                     # <== Set to 1 if you do not want tests to be hosted by the application, speeds up pure logic tests but you can not run them on real devices
 
 project(${DEVELOPMENT_PROJECT_NAME})
-include(BundleUtilities)
 include(FindXCTest)
 
 include_directories(/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
@@ -33,6 +32,7 @@ set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
 set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
 set(MACOSX_BUNDLE_COPYRIGHT "Copyright YOU")
 set(MACOSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
+
 
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
 #set(CMAKE_OSX_SYSROOT iphoneos)
@@ -54,12 +54,14 @@ set(RESOURCES
   ./Main.storyboard
   ./LaunchScreen.storyboard
 )
+add_subdirectory(cppframework)
+
 add_executable(
     ${APP_NAME}
     MACOSX_BUNDLE
     ${APP_HEADER_FILES}
     ${APP_SOURCE_FILES}
-    ${RESOURCES}
+    
 )
 
 link_directories(/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
@@ -92,7 +94,6 @@ link_directories(/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
 # )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks)
 # Build the C++ dynamically linked framework
-add_subdirectory(cppframework)
 add_dependencies(${APP_NAME} ${FRAMEWORK_NAME})
 
 # Build tests
@@ -153,6 +154,7 @@ set_target_properties(${APP_NAME} PROPERTIES
                       RESOURCE "${RESOURCES}"
                       XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES"
                       XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET}
+                      XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED ON
                       XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CODE_SIGN_IDENTITY}
                       XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${DEVELOPMENT_TEAM_ID}
                       XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY ${DEVICE_FAMILY}
@@ -199,8 +201,7 @@ add_custom_command(
         COMMAND_DONE=1 \;
     fi \;
     if ${CMAKE_COMMAND} -E make_directory
-        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks
-        \&\>/dev/null \; then
+        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks \; then
         COMMAND_DONE=1 \;
     fi \;
     if [ \\$$COMMAND_DONE -eq 0 ] \; then
@@ -217,45 +218,22 @@ add_custom_command(
     \"COMMAND_DONE=0 \;
     if ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_BINARY_DIR}/cppframework/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/
-        ${PROJECT_BINARY_DIR}/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${APP_NAME}.app/Frameworks
-        \&\>/dev/null \; then
+        ${PROJECT_BINARY_DIR}/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${APP_NAME}.app/Frameworks \; then
         COMMAND_DONE=1 \;
     fi \;
     if ${CMAKE_COMMAND} -E copy_directory
         \${BUILT_PRODUCTS_DIR}/${FRAMEWORK_NAME}.framework
-        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework
-        \&\>/dev/null \; then
+        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework \; then
         COMMAND_DONE=1 \;
     fi \;
     if [ \\$$COMMAND_DONE -eq 0 ] \; then
         echo Failed to copy the framework into the app bundle \;
         exit 1 \;
-    fi\"
+    fi \;
+    ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/Main.storyboard ${BUILT_PRODUCTS_DIR}/${APP_NAME}.app \;
+    ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/LaunchScreen.storyboard ${PROJECT_BINARY_DIR}/${APP_NAME}.app \"
 )
 
-# Codesign the framework in it's new spot
-add_custom_command(
-    TARGET
-    ${APP_NAME}
-    POST_BUILD COMMAND /bin/sh -c
-    \"COMMAND_DONE=0 \;
-    if codesign --force --verbose
-        ${PROJECT_BINARY_DIR}/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework
-        --sign ${CODE_SIGN_IDENTITY}
-        \&\>/dev/null \; then
-        COMMAND_DONE=1 \;
-    fi \;
-    if codesign --force --verbose
-        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework
-        --sign ${CODE_SIGN_IDENTITY}
-        \&\>/dev/null \; then
-        COMMAND_DONE=1 \;
-    fi \;
-    if [ \\$$COMMAND_DONE -eq 0 ] \; then
-        echo Framework codesign failed \;
-        exit 1 \;
-    fi\"
-)
 
 # Add a "PlugIns" folder as a kludge fix for how the XcTest package generates paths 
 add_custom_command(
@@ -272,4 +250,35 @@ add_custom_command(
         echo Failed to create PlugIns directory in EFFECTIVE_PLATFORM_NAME folder. \;
         exit 1 \;
     fi\"
+)
+
+# Codesign the framework in it's new spot
+add_custom_command(
+    TARGET
+    ${APP_NAME}
+    POST_BUILD COMMAND /bin/sh -c
+    \"COMMAND_DONE=0 \;
+    if codesign --force --verbose
+        ${PROJECT_BINARY_DIR}/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework
+        --sign ${CODE_SIGN_IDENTITY} \; then
+        COMMAND_DONE=1 \;
+    fi \;
+    if codesign --force --verbose
+        ${PROJECT_BINARY_DIR}/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${APP_NAME}.app
+        --sign ${CODE_SIGN_IDENTITY} \; then
+        COMMAND_DONE=1 \;
+    fi \;
+    if codesign --force --verbose
+        \${BUILT_PRODUCTS_DIR}/${APP_NAME}.app/Frameworks/${FRAMEWORK_NAME}.framework
+        --sign ${CODE_SIGN_IDENTITY} \; then
+        COMMAND_DONE=1 \;
+    fi \;
+    if [ \\$$COMMAND_DONE -eq 0 ] \; then
+        echo Framework codesign failed \;
+        exit 1 \;
+    else 
+        echo Framework codesign success \;
+    fi\;
+    spctl -a -vvvv ${PROJECT_BINARY_DIR}/${APP_NAME}.app \;
+    \"
 )

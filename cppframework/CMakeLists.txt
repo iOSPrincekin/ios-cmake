@@ -39,15 +39,10 @@ set_target_properties(${FRAMEWORK_NAME} PROPERTIES
 
 set(PRODUCT_NAME FooBar)
 
-add_custom_command(
-    TARGET ${FRAMEWORK_NAME}
-    POST_BUILD
-    COMMAND /bin/bash -c "${CMAKE_CURRENT_LIST_DIR}/install_name.sh /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks/FooBar.framework/FooBar"
-)
 
 add_custom_command(
     TARGET ${FRAMEWORK_NAME}
     POST_BUILD
-    COMMAND install_name_tool -id \"@rpath/\${PRODUCT_NAME}.framework/\${PRODUCT_NAME}\" /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks/FooBar.framework/FooBar
+    COMMAND install_name_tool -id \"@executable_path/Frameworks/FooBar.framework/FooBar\" /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks/FooBar.framework/FooBar
 )
 

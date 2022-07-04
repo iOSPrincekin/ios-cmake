@@ -34,6 +34,7 @@ set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
 set(MACOSX_BUNDLE_COPYRIGHT "Copyright YOU")
 set(MACOSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
 
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
 #set(CMAKE_OSX_SYSROOT iphoneos)
 set(APP_HEADER_FILES
   ./AppDelegate.h
@@ -113,13 +114,26 @@ find_library(SYSTEMCONFIGURATION SystemConfiguration)
 #target_link_libraries(${APP_NAME} /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks/FooBar.framework)
 
 
+list(APPEND CMAKE_FRAMEWORK_PATH "/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks")
+link_directories("/Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks")
+find_library(FooBarFramework
+    NAMES FooBar
+    PATHS /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks
+    NO_DEFAULT_PATH)
+if(NOT FooBarFramework)
+  message(FATAL_ERROR "FooBarFramework library not found")
+else()
+  message("FooBarFramework Path : ${FooBarFramework}")
+endif()
+
+
 target_link_libraries(${APP_NAME}
   "-framework MobileCoreServices"
   "-framework Foundation"
   "-framework UIKit"
   "-framework CFNetwork"
   "-framework SystemConfiguration"
-  "-framework FooBar"
+  ${FooBarFramework}
   )
 
 # Link the framework to the app
@@ -154,8 +168,9 @@ set_target_properties(${APP_NAME} PROPERTIES
 # "Archive" works fine just relying on default search paths as it has different
 # build product output directory.
 target_include_directories(${APP_NAME} PUBLIC 
-    "${PROJECT_BINARY_DIR}/cppframework/\${CONFIGURATION}\${EFFECTIVE_PLATFORM_NAME}/${FRAMEWORK_NAME}.framework"
+    /Users/lee/Desktop/TONGDUN/demo/company/ios-cmake/Frameworks
 )
+
 
 # Set the app's linker search path to the default location on iOS
 set_target_properties(

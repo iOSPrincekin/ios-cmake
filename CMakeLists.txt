@@ -9,6 +9,7 @@ set(FRAMEWORK_BUNDLE_IDENTIFIER "com.company.framework")    # <== Set to your fr
 set(TEST_NAME "Tests")                                      # <== Set to your test's name
 set(TEST_BUNDLE_IDENTIFIER "com.company.tests")             # <== Set to your tests's bundle ID
 set(CODE_SIGN_IDENTITY "Apple Development: lslboyfuture@icloud.com")                  # <== Set to your preferred code sign identity, to see list:
+set(PROVISIONING_FILE "ffaf5eea-d915-414d-b7e3-53d73e4776fa")                  # <== Set to your preferred code sign identity, to see list:
                                                             # /usr/bin/env xcrun security find-identity -v -p codesigning
 set(DEPLOYMENT_TARGET 8.0)                                  # <== Set your deployment target version of iOS
 set(DEVICE_FAMILY "1")                                      # <== Set to "1" to target iPhone, set to "2" to target iPad, set to "1,2" to target both
@@ -157,6 +158,7 @@ set_target_properties(${APP_NAME} PROPERTIES
                       XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED ON
                       XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CODE_SIGN_IDENTITY}
                       XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${DEVELOPMENT_TEAM_ID}
+                      XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
                       XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY ${DEVICE_FAMILY}
                       MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/plist.in
                       XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
